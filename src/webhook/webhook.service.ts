@@ -66,12 +66,11 @@ export class WebhookService {
 
       const existingUser = await this.userService.getUserByEmail(email);
 
-      if (!existingUser) {
-        await this.userService.createUser(email, title);
-        console.log(`Usuário criado: ${email}`);
-      } else {
-        console.log("Usuário já existe:", email);
+      if (existingUser) {
+        return null;
       }
+      await this.userService.createUser(email, title);
+      console.log(`Usuário criado: ${email}`);
     }
   }
 }

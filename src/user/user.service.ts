@@ -25,6 +25,16 @@ export class UserService {
     });
   }
 
+  async getProductsByEmail(email: string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    return user?.products;
+  }
+
   // Função para adicionar produtos a um usuário existente
   async addProductsToUser(email: string, products: string[]): Promise<any> {
     return await this.prisma.user.update({
