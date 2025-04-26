@@ -37,7 +37,7 @@ export class WebhookService {
     console.log(
       "Payload recebido:",
       payload.order.email,
-      payload.order.line_items.title.map((item: any) => item.title)
+      payload.order.line_items.map((item: any) => item.title)
     );
 
     await this.userService.createUser(
