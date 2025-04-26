@@ -34,6 +34,15 @@ export class WebhookService {
   }
 
   async paidOrder(payload: any): Promise<any> {
-    console.log("Payload recebido:", payload);
+    console.log(
+      "Payload recebido:",
+      payload.order.email,
+      payload.order.line_items
+    );
+
+    await this.userService.createUser(
+      payload.order.email,
+      payload.order.line_items.map((item: any) => item.title)
+    );
   }
 }
