@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Body, Controller, Get, Post } from "@nestjs/common";
 import { WebhookService } from "./webhook.service";
 
 @Controller("webhook")
@@ -8,5 +8,10 @@ export class WebhookController {
   @Get()
   async getOrders() {
     return this.webhookService.getOrders();
+  }
+
+  @Post("paid-order")
+  async paidOrder(@Body() payload: any) {
+    return this.webhookService.paidOrder(payload);
   }
 }

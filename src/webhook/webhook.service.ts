@@ -32,4 +32,8 @@ export class WebhookService {
     console.log("Hello World");
     return "Hello World";
   }
+
+  async paidOrder(payload: any): Promise<any> {
+    console.log("Payload recebido:", payload);
+  }
 }
