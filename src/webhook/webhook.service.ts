@@ -4,6 +4,7 @@ import axios from "axios";
 import { WebhookResponse } from "./types/webhook-response";
 import { Cron } from "@nestjs/schedule";
 import { UserService } from "src/user/user.service";
+import { EmailService } from "src/email/email.service";
 
 @Injectable()
 export class WebhookService {
@@ -11,7 +12,8 @@ export class WebhookService {
   private token: string;
   constructor(
     private configService: ConfigService,
-    private userService: UserService
+    private userService: UserService,
+    private emailService: EmailService
   ) {
     const apiUrl = this.configService.get<string>("API_URL");
     const token = this.configService.get<string>("TOKEN");
@@ -44,5 +46,16 @@ export class WebhookService {
       payload.order.email,
       payload.order.line_items.map((item: any) => item.title)
     );
+  }
+
+  async testEmail() {
+    await this.emailService.sendEmail(
+      "mtguerson@gmail.com",
+      "Teste",
+      "Teste de email",
+      `<h1>Obrigado por se cadastrar!</h1>`
+    );
+
+    return { message: "Email enviado com sucesso!" };
   }
 }
