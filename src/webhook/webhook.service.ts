@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { UserService } from "src/user/user.service";
 import { EmailService } from "src/email/email.service";
+import { Payload } from "./types/webhook-payload";
 
 @Injectable()
 export class WebhookService {
@@ -27,16 +28,16 @@ export class WebhookService {
     this.token = token;
   }
 
-  async paidOrder(payload: any): Promise<any> {
+  async paidOrder(payload: Payload): Promise<any> {
     console.log(
       "Payload recebido:",
-      payload,
+      payload.order.customer.first_name,
       payload.order.email,
       payload.order.line_items.map((item: any) => item.title)
     );
 
     await this.userService.createUser(
-      payload.order.name,
+      payload.order.customer.first_name,
       payload.order.email,
       payload.order.line_items.map((item: any) => item.title)
     );
