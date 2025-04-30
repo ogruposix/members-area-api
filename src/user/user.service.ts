@@ -7,9 +7,14 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   // Função para criar um novo usuário
-  async createUser(email: string, products: string[]): Promise<any> {
+  async createUser(
+    name: string,
+    email: string,
+    products: string[]
+  ): Promise<any> {
     return await this.prisma.user.create({
       data: {
+        name,
         email,
         products,
       },

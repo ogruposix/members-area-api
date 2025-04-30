@@ -5,11 +5,6 @@ import { WebhookService } from "./webhook.service";
 export class WebhookController {
   constructor(private readonly webhookService: WebhookService) {}
 
-  @Get()
-  async getOrders() {
-    return this.webhookService.getOrders();
-  }
-
   @Post("paid-order")
   async paidOrder(@Body() payload: any) {
     return this.webhookService.paidOrder(payload);
