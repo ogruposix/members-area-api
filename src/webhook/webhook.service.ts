@@ -30,7 +30,7 @@ export class WebhookService {
   async paidOrder(payload: any): Promise<any> {
     console.log(
       "Payload recebido:",
-      payload.order.first_name,
+      payload,
       payload.order.email,
       payload.order.line_items.map((item: any) => item.title)
     );
