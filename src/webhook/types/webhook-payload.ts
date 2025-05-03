@@ -185,7 +185,7 @@ interface Webhook {
   webhooks_to_collection: string | null;
 }
 
-export interface Payload {
+export interface WebhookPayload {
   event: string;
   order: Order;
   webhook: Webhook;

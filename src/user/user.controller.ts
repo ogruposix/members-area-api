@@ -5,6 +5,13 @@ import { UserService } from "./user.service";
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get()
+  async getUserByEmail(@Query("email") email: string) {
+    const user = await this.userService.getUserByEmail(email);
+
+    return user;
+  }
+
   @Get("products")
   async getUserProducts(@Query("email") email: string) {
     const products = await this.userService.getProductsByEmail(email);
