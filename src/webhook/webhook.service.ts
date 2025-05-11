@@ -11,17 +11,20 @@ export class WebhookService {
   ) {}
 
   async paidOrder(payload: WebhookPayload) {
+    const { order } = payload;
+    const { customer, email, line_items } = order;
+
     console.log(
-      "Payload recebido:",
-      payload.order.customer.first_name,
-      payload.order.email,
-      payload.order.line_items.map((item: any) => item.title)
+      "Payload received:",
+      customer.first_name,
+      email,
+      line_items.map((item: any) => item.title)
     );
 
     await this.userService.createUser(
-      payload.order.customer.first_name,
-      payload.order.email,
-      payload.order.line_items.map((item: any) => item.title)
+      customer.first_name,
+      email,
+      line_items.map((item: any) => item.title)
     );
   }
 
@@ -119,6 +122,6 @@ export class WebhookService {
       `
     );
 
-    return { message: "Email enviado com sucesso!" };
+    return { message: "Email sent successfully!" };
   }
 }
