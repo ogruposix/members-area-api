@@ -13,8 +13,8 @@ export class WebhookController {
     return this.webhookService.paidOrder(payload);
   }
 
-  @Post("email-test")
-  async testEmail() {
-    return this.webhookService.testEmail();
-  }
+  // @Post("email-test")
+  // async testEmail() {
+  //   return this.webhookService.testEmail();
+  // }
 }

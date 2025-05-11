@@ -1,5 +1,11 @@
-import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { UserService } from "./user.service";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 
 @Controller("user")
 export class UserController {
@@ -8,14 +14,12 @@ export class UserController {
   @Get("products")
   async getUserProducts(@Query("email") email: string) {
     const products = await this.userService.getProductsByEmail(email);
-
     return { products };
   }
 
   @Get(":email")
   async getUserByEmail(@Param("email") email: string) {
     const user = await this.userService.getUserByEmail(email);
-
     return user;
   }
 }
