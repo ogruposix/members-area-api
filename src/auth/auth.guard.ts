@@ -20,6 +20,14 @@ export class AuthGuard implements CanActivate {
     private configService: ConfigService
   ) {}
 
+  private hasRequiredRole(userRoles: Role[], requiredRoles: Role[]): boolean {
+    if (userRoles.includes(Role.ADMIN)) {
+      return true;
+    }
+
+    return userRoles.some((role) => requiredRoles.includes(role));
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
@@ -54,9 +62,7 @@ export class AuthGuard implements CanActivate {
 
       const userRoles = payload.roles || [];
 
-      const hasRole = userRoles.some((role) => requiredRoles.includes(role));
-
-      if (!hasRole) {
+      if (!this.hasRequiredRole(userRoles, requiredRoles)) {
         throw new UnauthorizedException("Insufficient permission");
       }
 
