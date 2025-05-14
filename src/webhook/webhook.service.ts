@@ -3,62 +3,103 @@ import { UserService } from "src/user/user.service";
 import { EmailService } from "src/email/email.service";
 import { WebhookPayload } from "./types/webhook-payload";
 import { OrderService } from "src/order/order.service";
+import { WebhookResponse } from "./types/webhook-response";
+
+interface OrderLineItem {
+  title: string;
+  [key: string]: any;
+}
+
+interface OrderCustomer {
+  first_name: string;
+  [key: string]: any;
+}
+
+interface Order {
+  id: string | number;
+  customer: OrderCustomer;
+  email: string;
+  line_items: OrderLineItem[];
+  tracking_number: string | null;
+  [key: string]: any;
+}
 
 @Injectable()
 export class WebhookService {
   constructor(
-    private userService: UserService,
-    private orderService: OrderService,
-    private emailService: EmailService
+    private readonly userService: UserService,
+    private readonly orderService: OrderService // private readonly emailService: EmailService
   ) {}
 
-  async paidOrder(payload: WebhookPayload) {
+  async paidOrder(payload: WebhookPayload): Promise<WebhookResponse> {
     const { order } = payload;
-    const { customer, email, line_items, id, tracking_number } = order;
+    const orderId = order.id.toString();
 
-    const orderAlreadyExists = await this.orderService.findOne(id.toString());
+    const existingOrder = await this.orderService.findOne(orderId);
 
-    if (orderAlreadyExists?.trackingNumber) {
-      return { message: "Tracking number already exists" };
+    if (existingOrder?.trackingNumber) {
+      return {
+        message: "Order already completed",
+      };
     }
 
-    if (orderAlreadyExists && tracking_number === null) {
-      throw new BadRequestException("Tracking number not updated");
+    if (existingOrder && order.tracking_number === null) {
+      throw new BadRequestException("Tracking number not updated yet");
     }
 
-    if (tracking_number) {
-      return await this.orderService.updateOrder(id.toString(), {
-        trackingNumber: tracking_number.toString(),
+    if (order.tracking_number) {
+      await this.orderService.updateOrder(orderId, {
+        trackingNumber: order.tracking_number.toString(),
       });
+      return {
+        message: "Order updated successfully",
+      };
     }
 
-    if (!orderAlreadyExists) {
-      const products = line_items.map((item: any) => item.title);
-
-      console.log(
-        "Payload received:",
-        customer.first_name,
-        email,
-        id,
-        products,
-        tracking_number
+    if (!existingOrder) {
+      const products = this.extractProducts((order as Order).line_items);
+      const user = await this.createUser(
+        order.customer.first_name,
+        order.email
       );
 
-      const user = await this.userService.createUser(
-        customer.first_name,
-        email
-      );
-      await this.orderService.createOrder({
-        id: order.id.toString(),
-        products,
-        trackingNumber: order.tracking_number?.toString() || null,
-        userId: user.id,
-      });
+      await this.createOrder(order as Order, products, user.id);
+      this.logOrderCreation(order as Order, products);
 
-      console.log("criou");
+      return {
+        message: "Order created successfully",
+      };
     }
 
-    throw new BadRequestException("Tracking number not updated");
+    throw new BadRequestException("Tracking number not updated yet");
+  }
+
+  private extractProducts(lineItems: OrderLineItem[]): string[] {
+    return lineItems.map((item) => item.title);
+  }
+
+  private async createUser(firstName: string, email: string) {
+    return await this.userService.createUser(firstName, email);
+  }
+
+  private async createOrder(order: Order, products: string[], userId: string) {
+    await this.orderService.createOrder({
+      id: order.id.toString(),
+      products,
+      trackingNumber: order.tracking_number?.toString() || null,
+      userId,
+    });
+  }
+
+  private logOrderCreation(order: Order, products: string[]) {
+    console.log(
+      "Payload received:",
+      order.customer.first_name,
+      order.email,
+      order.id,
+      products,
+      order.tracking_number
+    );
   }
 
   // async testEmail() {

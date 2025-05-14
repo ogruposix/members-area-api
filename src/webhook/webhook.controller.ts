@@ -1,7 +1,8 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, HttpCode, HttpStatus } from "@nestjs/common";
 import { WebhookService } from "./webhook.service";
 import { WebhookPayload } from "./types/webhook-payload";
 import { Public } from "src/decorators/public.decorator";
+import { WebhookResponse } from "./types/webhook-response";
 
 @Controller("webhook")
 export class WebhookController {
@@ -9,8 +10,9 @@ export class WebhookController {
 
   @Public()
   @Post("paid-order")
-  async paidOrder(@Body() payload: WebhookPayload) {
-    return this.webhookService.paidOrder(payload);
+  @HttpCode(HttpStatus.OK)
+  async paidOrder(@Body() payload: WebhookPayload): Promise<WebhookResponse> {
+    return await this.webhookService.paidOrder(payload);
   }
 
   // @Post("email-test")
