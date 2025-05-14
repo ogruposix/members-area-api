@@ -22,32 +22,36 @@ export class UserService {
     return user;
   }
 
-  async getUserByEmail(email: string): Promise<User> {
+  async getProductsByUserId(userId: string): Promise<{ products: string[] }> {
     const user = await this.prisma.user.findUnique({
       where: {
-        email,
+        id: userId,
       },
     });
 
     if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
+      throw new NotFoundException(`User not found`);
+    }
+
+    return { products: user?.products };
+  }
+
+  async getUserById(userId: string): Promise<Partial<User>> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        name: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User not found`);
     }
 
     return user;
-  }
-
-  async getProductsByEmail(email: string): Promise<string[]> {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
-    }
-
-    return user?.products;
   }
 
   async findOne(email: string): Promise<User> {

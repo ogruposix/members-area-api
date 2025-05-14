@@ -1,25 +1,17 @@
-import { Controller, Get, Param, Query } from "@nestjs/common";
+import { Controller, Get } from "@nestjs/common";
 import { UserService } from "./user.service";
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from "@nestjs/swagger";
-
+import { ActiveUserId } from "src/decorators/active-user-id";
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get("products")
-  async getUserProducts(@Query("email") email: string) {
-    const products = await this.userService.getProductsByEmail(email);
-    return { products };
+  @Get("/products")
+  async getUserProducts(@ActiveUserId() userId: string) {
+    return await this.userService.getProductsByUserId(userId);
   }
 
-  @Get(":email")
-  async getUserByEmail(@Param("email") email: string) {
-    const user = await this.userService.getUserByEmail(email);
-    return user;
+  @Get("/me")
+  async getMe(@ActiveUserId() userId: string) {
+    return await this.userService.getUserById(userId);
   }
 }
