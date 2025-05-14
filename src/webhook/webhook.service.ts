@@ -58,13 +58,24 @@ export class WebhookService {
 
     if (!existingOrder) {
       const products = this.extractProducts((order as Order).line_items);
-      const user = await this.createUser(
-        order.customer.first_name,
-        order.email
-      );
 
-      await this.createOrder(order as Order, products, user.id);
-      this.logOrderCreation(order as Order, products);
+      const userExists = await this.userService.findOne(order.customer.email);
+
+      if (!userExists) {
+        const user = await this.createUser(
+          order.customer.first_name,
+          order.email
+        );
+
+        await this.createOrder(order as Order, products, user.id);
+        this.logOrderCreation(order as Order, products);
+
+        return {
+          message: "Order and User created successfully",
+        };
+      }
+
+      await this.createOrder(order as Order, products, userExists.id);
 
       return {
         message: "Order created successfully",
