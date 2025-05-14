@@ -6,7 +6,8 @@ import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { AuthModule } from "./auth/auth.module";
 import { EmailModule } from "./email/email.module";
-import { EmailService } from "./email/email.service";
+import { OrderModule } from "./order/order.module";
+import { UserModule } from "./user/user.module";
 
 @Module({
   imports: [
@@ -15,8 +16,10 @@ import { EmailService } from "./email/email.service";
     WebhookModule,
     AuthModule,
     EmailModule,
+    OrderModule,
+    UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [AppService],
 })
 export class AppModule {}

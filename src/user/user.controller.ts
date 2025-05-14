@@ -7,9 +7,9 @@ import { CreateUserDto } from "./dto/create-user.dto";
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get("/products")
-  async getUserProducts(@ActiveUserId() userId: string) {
-    return await this.userService.getProductsByUserId(userId);
+  @Get("/orders")
+  async getOrders(@ActiveUserId() userId: string) {
+    return await this.userService.getOrdersByUserId(userId);
   }
 
   @Get("/me")
@@ -20,10 +20,6 @@ export class UserController {
   @Public()
   @Post("/create")
   async createUser(@Body() body: CreateUserDto) {
-    return await this.userService.createUser(
-      body.name,
-      body.email,
-      body.products as string[]
-    );
+    return await this.userService.createUser(body.name, body.email);
   }
 }

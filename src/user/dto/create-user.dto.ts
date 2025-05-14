@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Order } from "@prisma/client";
 
 export class CreateUserDto {
   @ApiProperty({
@@ -12,11 +13,4 @@ export class CreateUserDto {
     example: "john.doe@example.com",
   })
   email: string;
-
-  @ApiProperty({
-    description: "User Products",
-    example: ["Product 1", "Product 2"],
-    type: [String],
-  })
-  products: string[];
 }

@@ -19,9 +19,19 @@ enum Role {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  name     String
-  email    String   @unique
-  products String[]
-  role     Role     @default(USER)
+  id    String @id @default(uuid())
+  name  String
+  email String @unique
+  role  Role   @default(USER)
+
+  orders Order[]
+}
+
+model Order {
+  id             String   @id
+  userId         String
+  products       String[]
+  trackingNumber String?
+
+  user User @relation(fields: [userId], references: [id])
 }
