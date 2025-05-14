@@ -9,7 +9,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 import { IS_PUBLIC_KEY } from "src/decorators/public.decorator";
 import { ConfigService } from "@nestjs/config";
-import { ROLES_KEY } from "../decorators/roles.decorator";
+import { ROLE_KEY } from "../decorators/roles.decorator";
 import { Role } from "@prisma/client";
 
 @Injectable()
@@ -20,12 +20,12 @@ export class AuthGuard implements CanActivate {
     private configService: ConfigService
   ) {}
 
-  private hasRequiredRole(userRoles: Role[], requiredRoles: Role[]): boolean {
-    if (userRoles.includes(Role.ADMIN)) {
+  private hasRequiredRole(userRole: Role, requiredRole: Role): boolean {
+    if (userRole === Role.ADMIN) {
       return true;
     }
 
-    return userRoles.some((role) => requiredRoles.includes(role));
+    return userRole === requiredRole;
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -50,19 +50,19 @@ export class AuthGuard implements CanActivate {
         secret: this.configService.get<string>("JWT_SECRET"),
       });
 
-      const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
-        ROLES_KEY,
-        [context.getHandler(), context.getClass()]
-      );
+      const requiredRole = this.reflector.getAllAndOverride<Role>(ROLE_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
 
-      if (!requiredRoles) {
+      if (!requiredRole) {
         request["user"] = payload;
         return true;
       }
 
-      const userRoles = payload.roles || [];
+      const userRole = payload.role;
 
-      if (!this.hasRequiredRole(userRoles, requiredRoles)) {
+      if (!this.hasRequiredRole(userRole, requiredRole)) {
         throw new UnauthorizedException("Insufficient permission");
       }
 
