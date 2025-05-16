@@ -12,6 +12,12 @@ export class WebhookController {
   @Post("paid-order")
   @HttpCode(HttpStatus.OK)
   async paidOrder(@Body() payload: WebhookPayload): Promise<WebhookResponse> {
+    console.log(
+      payload.order.id,
+      payload.order.tracking_number,
+      payload.order.customer.first_name,
+      payload.order.email
+    );
     return await this.webhookService.paidOrder(payload);
   }
 
