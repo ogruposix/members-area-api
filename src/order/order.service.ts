@@ -3,14 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { Order } from "@prisma/client";
+import { Order, Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class OrderService {
   constructor(private prisma: PrismaService) {}
 
-  async createOrder(order: Order) {
+  async createOrder(order: Prisma.OrderCreateArgs["data"]) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: order.userId,
