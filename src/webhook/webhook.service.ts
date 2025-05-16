@@ -48,9 +48,22 @@ export class WebhookService {
     }
 
     if (order.tracking_number) {
-      await this.orderService.updateOrder(orderId, {
-        trackingNumber: order.tracking_number.toString(),
-      });
+      if (existingOrder) {
+        await this.orderService.updateOrder(orderId, {
+          trackingNumber: order.tracking_number.toString(),
+        });
+      } else {
+        const user = await this.createUser(
+          order.customer.first_name,
+          order.email
+        );
+
+        const products = this.extractProducts((order as Order).line_items);
+
+        await this.createOrder(order as Order, products, user.id);
+        this.logOrderCreation(order as Order, products);
+      }
+
       return {
         message: "Order updated successfully",
       };
