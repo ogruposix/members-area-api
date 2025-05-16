@@ -61,7 +61,6 @@ export class WebhookService {
         const products = this.extractProducts((order as Order).line_items);
 
         await this.createOrder(order as Order, products, user.id);
-        this.logOrderCreation(order as Order, products);
       }
 
       return {
@@ -81,7 +80,6 @@ export class WebhookService {
         );
 
         await this.createOrder(order as Order, products, user.id);
-        this.logOrderCreation(order as Order, products);
 
         return {
           message: "Order and User created successfully",
@@ -113,17 +111,6 @@ export class WebhookService {
       trackingNumber: order.tracking_number?.toString() || null,
       userId,
     });
-  }
-
-  private logOrderCreation(order: Order, products: string[]) {
-    console.log(
-      "Payload received:",
-      order.customer.first_name,
-      order.email,
-      order.id,
-      products,
-      order.tracking_number
-    );
   }
 
   // async testEmail() {
