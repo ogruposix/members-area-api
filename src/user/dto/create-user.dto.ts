@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Order } from "@prisma/client";
+import { Role } from "@prisma/client";
 
 export class CreateUserDto {
   @ApiProperty({
@@ -13,4 +13,11 @@ export class CreateUserDto {
     example: "john.doe@example.com",
   })
   email: string;
+
+  @ApiProperty({
+    description: "User Role",
+    example: "ADMIN",
+    enum: Role,
+  })
+  role: Role;
 }
