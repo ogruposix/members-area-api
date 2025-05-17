@@ -9,6 +9,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 interface PaginationParams {
   page?: number;
   limit?: number;
+  role?: Role;
 }
 
 export interface PaginatedResponse<T> {
@@ -101,6 +102,9 @@ export class UserService {
         },
         skip,
         take: limit,
+        where: {
+          role: params?.role,
+        },
       }),
       this.prisma.user.count(),
     ]);
