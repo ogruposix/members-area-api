@@ -131,4 +131,23 @@ export class UserService {
       },
     });
   }
+
+  async countUsers(): Promise<{ adminsLength: number; usersLength: number }> {
+    const adminsLength = await this.prisma.user.count({
+      where: {
+        role: "ADMIN",
+      },
+    });
+
+    const usersLength = await this.prisma.user.count({
+      where: {
+        role: "USER",
+      },
+    });
+
+    return {
+      adminsLength,
+      usersLength,
+    };
+  }
 }

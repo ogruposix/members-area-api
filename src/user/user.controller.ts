@@ -47,4 +47,10 @@ export class UserController {
   async searchUsers(@Query() query: string) {
     return await this.userService.searchUsers(query);
   }
+
+  @Role("ADMIN")
+  @Get("count")
+  async countUsers() {
+    return await this.userService.countUsers();
+  }
 }
