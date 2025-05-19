@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
 import { UserService, PaginatedResponse } from "./user.service";
 import { ActiveUserId } from "src/decorators/active-user-id";
 import { Public } from "src/decorators/public.decorator";
@@ -44,13 +44,19 @@ export class UserController {
 
   @Role("ADMIN")
   @Get("search")
-  async searchUsers(@Query() query: string) {
-    return await this.userService.searchUsers(query);
+  async searchUser(@Query("query") query: string) {
+    return await this.userService.searchUser(query);
   }
 
   @Role("ADMIN")
   @Get("count")
   async countUsers() {
     return await this.userService.countUsers();
+  }
+
+  @Role("ADMIN")
+  @Get(":id")
+  async getUserById(@Param("id") id: string) {
+    return await this.userService.getUserById(id);
   }
 }

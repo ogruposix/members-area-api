@@ -63,7 +63,10 @@ export class UserService {
       select: {
         id: true,
         name: true,
+        email: true,
         role: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -121,8 +124,8 @@ export class UserService {
     };
   }
 
-  async searchUsers(query: string): Promise<User[]> {
-    return await this.prisma.user.findMany({
+  async searchUser(query: string): Promise<User[]> {
+    const user = await this.prisma.user.findMany({
       where: {
         OR: [
           { name: { contains: query, mode: "insensitive" } },
@@ -130,6 +133,8 @@ export class UserService {
         ],
       },
     });
+
+    return user;
   }
 
   async countUsers(): Promise<{ adminsLength: number; usersLength: number }> {
