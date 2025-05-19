@@ -41,4 +41,10 @@ export class UserController {
 
     return await this.userService.findAll({ page, limit });
   }
+
+  @Role("ADMIN")
+  @Get("search")
+  async searchUsers(@Query() query: string) {
+    return await this.userService.searchUsers(query);
+  }
 }

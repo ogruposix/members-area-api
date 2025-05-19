@@ -5,7 +5,6 @@ import {
 } from "@nestjs/common";
 import { Order, Role, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-
 interface PaginationParams {
   page?: number;
   limit?: number;
@@ -120,5 +119,16 @@ export class UserService {
         totalPages,
       },
     };
+  }
+
+  async searchUsers(query: string): Promise<User[]> {
+    return await this.prisma.user.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { email: { contains: query, mode: "insensitive" } },
+        ],
+      },
+    });
   }
 }
