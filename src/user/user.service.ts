@@ -67,6 +67,7 @@ export class UserService {
         role: true,
         createdAt: true,
         updatedAt: true,
+        imageUrl: true,
       },
     });
 

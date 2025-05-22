@@ -49,5 +49,9 @@ export class FileController {
         imageUrl: url,
       },
     });
+
+    return {
+      url,
+    };
   }
 }
