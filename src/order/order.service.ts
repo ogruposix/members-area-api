@@ -30,6 +30,7 @@ export class OrderService {
     if (orderExists) {
       throw new BadRequestException("Order already exists");
     }
+
     return await this.prisma.order.create({
       data: order,
     });
