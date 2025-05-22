@@ -66,6 +66,6 @@ export class UserController {
     @ActiveUserId() userId: string,
     @Body() data: Partial<User>
   ) {
-    return await this.userService.updateUser(userId, data);
+    await this.userService.updateUser(userId, data);
   }
 }
