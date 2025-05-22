@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { UserService, PaginatedResponse } from "./user.service";
 import { ActiveUserId } from "src/decorators/active-user-id";
 import { Public } from "src/decorators/public.decorator";
@@ -58,5 +58,14 @@ export class UserController {
   @Get(":id")
   async getUserById(@Param("id") id: string) {
     return await this.userService.getUserById(id);
+  }
+
+  @Role("ADMIN")
+  @Put("update")
+  async updateUser(
+    @ActiveUserId() userId: string,
+    @Body() data: Partial<User>
+  ) {
+    return await this.userService.updateUser(userId, data);
   }
 }

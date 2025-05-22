@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import { Order, Role, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
+import * as bcrypt from "bcrypt";
 interface PaginationParams {
   page?: number;
   limit?: number;
@@ -155,5 +156,30 @@ export class UserService {
       adminsLength,
       usersLength,
     };
+  }
+
+  async updateUser(userId: string, data: Partial<User>): Promise<User> {
+    if (data.password) {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+
+      return await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          ...data,
+          password: hashedPassword,
+        },
+      });
+    }
+
+    const user = await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data,
+    });
+
+    return user;
   }
 }

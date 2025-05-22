@@ -6,4 +6,11 @@ export class SignInDto {
     example: "john.doe@example.com",
   })
   email: string;
+
+  @ApiProperty({
+    description: "User Password",
+    example: "password",
+    required: false,
+  })
+  password?: string;
 }

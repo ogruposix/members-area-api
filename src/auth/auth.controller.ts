@@ -10,6 +10,6 @@ export class AuthController {
   @Public()
   @Post("sign-in")
   async signIn(@Body() signInDto: SignInDto) {
-    return this.authService.signIn(signInDto.email);
+    return this.authService.signIn(signInDto.email, signInDto.password);
   }
 }
