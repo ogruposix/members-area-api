@@ -9,6 +9,7 @@ import { User } from "@prisma/client";
 interface PaginationQuery {
   page?: string;
   limit?: string;
+  role?: "USER" | "ADMIN";
 }
 
 @Controller("user")
@@ -38,8 +39,9 @@ export class UserController {
   ): Promise<PaginatedResponse<Partial<User>>> {
     const page = query.page ? parseInt(query.page) : undefined;
     const limit = query.limit ? parseInt(query.limit) : undefined;
+    const role = query.role as "USER" | "ADMIN" | undefined;
 
-    return await this.userService.findAll({ page, limit });
+    return await this.userService.findAll({ page, limit, role });
   }
 
   @Role("ADMIN")
