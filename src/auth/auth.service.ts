@@ -1,11 +1,11 @@
 import {
   Injectable,
   NotFoundException,
-  UnauthorizedException,
+  // UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "src/user/user.service";
-import * as bcrypt from "bcrypt";
+// import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
@@ -24,31 +24,31 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
 
-    if (user.role === "ADMIN" && user.password && !password) {
-      throw new UnauthorizedException("Password is required");
-    }
+    // if (user.role === "ADMIN" && user.password && !password) {
+    //   throw new UnauthorizedException("Password is required");
+    // }
 
-    if (user.role === "ADMIN" && user.password) {
-      const isPasswordValid = await bcrypt.compare(password!, user.password!);
+    // if (user.role === "ADMIN" && user.password) {
+    //   const isPasswordValid = await bcrypt.compare(password!, user.password!);
 
-      if (isPasswordValid) {
-        const payload = {
-          sub: user.id,
-          email: user.email,
-          role: user.role,
-        };
+    //   if (isPasswordValid) {
+    //     const payload = {
+    //       sub: user.id,
+    //       email: user.email,
+    //       role: user.role,
+    //     };
 
-        return {
-          access_token: await this.jwtService.signAsync(payload),
-        };
-      }
+    //     return {
+    //       access_token: await this.jwtService.signAsync(payload),
+    //     };
+    //   }
 
-      throw new UnauthorizedException("Invalid credentials");
-    }
+    //   throw new UnauthorizedException("Invalid credentials");
+    // }
 
-    if (user.role === "USER" && password) {
-      throw new UnauthorizedException("User cannot sign in with password");
-    }
+    // if (user.role === "USER" && password) {
+    //   throw new UnauthorizedException("User cannot sign in with password");
+    // }
 
     const payload = {
       sub: user.id,
