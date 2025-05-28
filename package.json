@@ -8,10 +8,10 @@
   "scripts": {
     "postinstall": "prisma generate",
     "build": "nest build",
-    "start": "prisma migrate deploy && nest start",
+    "start": "prisma migrate dev && nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "prisma migrate deploy && node dist/main",
+    "start:prod": "prisma migrate dev && node dist/main",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
