@@ -8,7 +8,7 @@
 CREATE TYPE "ProductType" AS ENUM ('WEIGHT_LOSS', 'ERECTILE_DYSFUNCTION', 'PROSTATE', 'NEUROPATHY', 'MEMORY', 'DIABETES');
 
 -- AlterTable
-ALTER TABLE "Order" ADD COLUMN     "productId" TEXT NOT NULL;
+ALTER TABLE "Order" ADD COLUMN     "productId" TEXT;
 
 -- CreateTable
 CREATE TABLE "Product" (
