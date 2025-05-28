@@ -30,4 +30,10 @@ export class CreateOrderDto {
     example: "1234567890",
   })
   trackingNumber: string | null;
+
+  @ApiProperty({
+    description: "The status of the order",
+    example: "pending",
+  })
+  productId: string;
 }
