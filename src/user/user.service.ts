@@ -110,7 +110,11 @@ export class UserService {
           role: params?.role,
         },
       }),
-      this.prisma.user.count(),
+      this.prisma.user.count({
+        where: {
+          role: params?.role,
+        },
+      }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
