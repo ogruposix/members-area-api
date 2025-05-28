@@ -9,6 +9,9 @@ import { EmailModule } from "./email/email.module";
 import { OrderModule } from "./order/order.module";
 import { UserModule } from "./user/user.module";
 import { FileModule } from "./file/file.module";
+import { ProductController } from './product/product.controller';
+import { ProductService } from './product/product.service';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -20,8 +23,9 @@ import { FileModule } from "./file/file.module";
     OrderModule,
     UserModule,
     FileModule,
+    ProductModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, ProductController],
+  providers: [AppService, ProductService],
 })
 export class AppModule {}

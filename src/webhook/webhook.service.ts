@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
-import { EmailService } from "src/email/email.service";
 import { WebhookPayload } from "./types/webhook-payload";
 import { OrderService } from "src/order/order.service";
 import { WebhookResponse } from "./types/webhook-response";
+import { ProductService } from "src/product/product.service";
 
 interface OrderLineItem {
   title: string;
@@ -28,6 +28,7 @@ interface Order {
 export class WebhookService {
   constructor(
     private readonly userService: UserService,
+    private readonly productService: ProductService,
     private readonly orderService: OrderService // private readonly emailService: EmailService
   ) {}
 
@@ -58,9 +59,11 @@ export class WebhookService {
           order.email
         );
 
-        const products = this.extractProducts((order as Order).line_items);
+        const productName = this.extractProductName((order as Order).line_items);
 
-        await this.createOrder(order as Order, products, user.id);
+        const { id: productId } = await this.productService.findOne(productName)
+
+        await this.createOrder(order as Order, user.id, productId);
       }
 
       return {
@@ -69,7 +72,7 @@ export class WebhookService {
     }
 
     if (!existingOrder) {
-      const products = this.extractProducts((order as Order).line_items);
+      const productName = this.extractProductName((order as Order).line_items);
 
       const userExists = await this.userService.findOne(order.customer.email);
 
@@ -79,14 +82,18 @@ export class WebhookService {
           order.email
         );
 
-        await this.createOrder(order as Order, products, user.id);
+        const { id: productId } = await this.productService.findOne(productName)
+
+        await this.createOrder(order as Order, user.id, productId);
 
         return {
           message: "Order and User created successfully",
         };
       }
 
-      await this.createOrder(order as Order, products, userExists.id);
+      const { id: productId } = await this.productService.findOne(productName)
+
+      await this.createOrder(order as Order, userExists.id, productId);
 
       return {
         message: "Order created successfully",
@@ -96,18 +103,18 @@ export class WebhookService {
     throw new BadRequestException("Tracking number not updated yet");
   }
 
-  private extractProducts(lineItems: OrderLineItem[]): string[] {
-    return lineItems.map((item) => item.title);
+  private extractProductName(lineItems: OrderLineItem[]): string {
+    return lineItems[0].title;
   }
 
   private async createUser(firstName: string, email: string) {
     return await this.userService.createUser(firstName, email);
   }
 
-  private async createOrder(order: Order, products: string[], userId: string) {
+  private async createOrder(order: Order, userId: string, productId: string) {
     await this.orderService.createOrder({
       id: order.id.toString(),
-      products,
+      productId,
       trackingNumber: order.tracking_number?.toString() || null,
       userId,
     });
