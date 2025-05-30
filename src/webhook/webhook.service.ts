@@ -53,8 +53,8 @@ export class WebhookService {
       if (existingOrder) {
         await this.orderService.updateOrder(orderId, {
           trackingNumber: order.tracking_number.toString(),
-          shippingProvider: order.fulfillments[0].tracking_company,
-          shippingDate: new Date(order.fulfillments[0].created_at),
+          shippingProvider: order?.fulfillments[0].tracking_company,
+          shippingDate: new Date(order?.fulfillments[0].created_at),
         });
       } else {
         const user = await this.createUser(
@@ -126,8 +126,8 @@ export class WebhookService {
       productId,
       trackingNumber: order.tracking_number?.toString() || null,
       userId,
-      shippingProvider: order.fulfillments[0].tracking_company || null,
-      shippingDate: new Date(order.fulfillments[0].created_at) || null,
+      shippingProvider: order.fulfillments[0]?.tracking_company || null,
+      shippingDate: new Date(order.fulfillments[0]?.created_at) || null,
     });
   }
 

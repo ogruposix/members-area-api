@@ -17,8 +17,9 @@ export class WebhookController {
       payload.order.tracking_number,
       payload.order.customer.first_name,
       payload.order.email,
-      payload.order.fulfillments[0].tracking_company,
-      payload.order.fulfillments[0].created_at
+      payload.order?.fulfillments[0]?.tracking_company,
+      payload.order?.fulfillments[0]?.created_at,
+      payload.order.line_items.map((item) => item.title)
     );
     return await this.webhookService.paidOrder(payload);
   }
