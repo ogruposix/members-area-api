@@ -126,8 +126,10 @@ export class WebhookService {
       productId,
       trackingNumber: order.tracking_number?.toString() || null,
       userId,
-      shippingProvider: order.fulfillments[0]?.tracking_company || null,
-      shippingDate: new Date(order.fulfillments[0]?.created_at) || null,
+      shippingProvider: order?.fulfillments[0]?.tracking_company || null,
+      shippingDate: order?.fulfillments[0]?.created_at
+        ? new Date(order?.fulfillments[0]?.created_at)
+        : null,
     });
   }
 
