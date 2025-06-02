@@ -1,4 +1,11 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  Req,
+} from "@nestjs/common";
 import { WebhookService } from "./webhook.service";
 import { WebhookPayload } from "./types/webhook-payload";
 import { Public } from "src/decorators/public.decorator";
@@ -11,7 +18,14 @@ export class WebhookController {
   @Public()
   @Post("paid-order")
   @HttpCode(HttpStatus.OK)
-  async paidOrder(@Body() payload: WebhookPayload): Promise<WebhookResponse> {
+  async paidOrder(
+    @Body() payload: WebhookPayload,
+    @Req() req: Request
+  ): Promise<WebhookResponse> {
+    const host = req.headers["host"];
+
+    console.log("Host", host);
+
     console.log(
       payload.order.id,
       payload.order.tracking_number,
