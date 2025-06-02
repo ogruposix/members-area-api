@@ -20,9 +20,9 @@ export class WebhookController {
   @HttpCode(HttpStatus.OK)
   async paidOrder(
     @Body() payload: WebhookPayload,
-    @Req() req: Request
+    @Req() req: any
   ): Promise<WebhookResponse> {
-    console.log(Headers, req.headers);
+    console.log("Raw Headers", req.rawHeaders);
 
     console.log(
       payload.order.id,
