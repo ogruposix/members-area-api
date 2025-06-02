@@ -4,7 +4,6 @@ import {
   Post,
   HttpCode,
   HttpStatus,
-  Req,
 } from "@nestjs/common";
 import { WebhookService } from "./webhook.service";
 import { WebhookPayload } from "./types/webhook-payload";
@@ -19,18 +18,23 @@ export class WebhookController {
   @Post("paid-order")
   @HttpCode(HttpStatus.OK)
   async paidOrder(
-    @Body() payload: WebhookPayload,
-    @Req() req: any
+    @Body() payload: WebhookPayload
   ): Promise<WebhookResponse> {
-    console.log("Raw Headers", req.rawHeaders);
 
     console.log(
+      "OrderId:",
       payload.order.id,
+      "Tracking Number:",
       payload.order.tracking_number,
+      "First Name:",
       payload.order.customer.first_name,
+      "Email:",
       payload.order.email,
+      "Tracking Company:",
       payload.order?.fulfillments[0]?.tracking_company || null,
+      "Created At:",
       payload.order?.fulfillments[0]?.created_at || null,
+      "Items Title:",
       payload.order.line_items.map((item) => item.title)
     );
     return await this.webhookService.paidOrder(payload);
