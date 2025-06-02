@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,22 +7,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model User {
   id        String    @id @default(uuid())
-  name      String
   email     String    @unique
-  password  String?
-  imageUrl  String?
+  name      String
   role      Role      @default(USER)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
+  imageUrl  String?
+  password  String?
+  orders    Order[]
+}
 
-  orders Order[]
+model Product {
+  id        String      @id @default(uuid())
+  name      String
+  type      ProductType
+  createdAt DateTime?   @default(now())
+  updatedAt DateTime?   @updatedAt
+  orders    Order[]
+}
+
+model Order {
+  id               String    @id
+  userId           String
+  trackingNumber   String?
+  createdAt        DateTime? @default(now())
+  updatedAt        DateTime? @updatedAt
+  productId        String?
+  shippingDate     DateTime?
+  shippingProvider String?
+  product          Product?  @relation(fields: [productId], references: [id])
+  user             User      @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 enum ProductType {
@@ -38,26 +53,4 @@ enum ProductType {
   NEUROPATHY
   MEMORY
   DIABETES
-}
-
-model Product {
-  id        String      @id @default(uuid())
-  name      String
-  type      ProductType
-  createdAt DateTime?   @default(now())
-  updatedAt DateTime?   @updatedAt
-
-  orders Order[]
-}
-
-model Order {
-  id             String    @id
-  userId         String
-  trackingNumber String?
-  createdAt      DateTime? @default(now())
-  updatedAt      DateTime? @updatedAt
-  productId      String?
-
-  product Product? @relation(fields: [productId], references: [id])
-  user    User     @relation(fields: [userId], references: [id])
 }

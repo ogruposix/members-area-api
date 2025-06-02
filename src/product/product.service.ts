@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Product } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { Product } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class ProductService {
@@ -17,16 +17,34 @@ export class ProductService {
   }
 
   async findOne(query: string) {
-    const product = await this.prisma.product.findFirst({
+    let product = await this.prisma.product.findFirst({
       where: {
-        name: {
-          contains: query,
-        },
+        name: query,
       },
     });
 
     if (!product) {
-      throw new NotFoundException('Product not found');
+      const words = query
+        .split(/[\s\-_,]+/)
+        .filter((word) => word.length > 2)
+        .map((word) => word.trim());
+
+      if (words.length > 0) {
+        product = await this.prisma.product.findFirst({
+          where: {
+            OR: words.map((word) => ({
+              name: {
+                contains: word,
+                mode: "insensitive",
+              },
+            })),
+          },
+        });
+      }
+    }
+
+    if (!product) {
+      throw new NotFoundException("Product not found");
     }
 
     return product;

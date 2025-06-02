@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
-import { WebhookPayload } from "./types/webhook-payload";
+import { Fulfillment, WebhookPayload } from "./types/webhook-payload";
 import { OrderService } from "src/order/order.service";
 import { WebhookResponse } from "./types/webhook-response";
 import { ProductService } from "src/product/product.service";
@@ -21,6 +21,7 @@ interface Order {
   email: string;
   line_items: OrderLineItem[];
   tracking_number: string | null;
+  fulfillments: Fulfillment[];
   [key: string]: any;
 }
 
@@ -45,13 +46,15 @@ export class WebhookService {
     }
 
     if (existingOrder && order.tracking_number === null) {
-      throw new BadRequestException("Tracking number not updated yet");
+      return { message: "Tracking number not updated yet" };
     }
 
     if (order.tracking_number) {
       if (existingOrder) {
         await this.orderService.updateOrder(orderId, {
           trackingNumber: order.tracking_number.toString(),
+          shippingProvider: order?.fulfillments[0].tracking_company,
+          shippingDate: new Date(order?.fulfillments[0].created_at),
         });
       } else {
         const user = await this.createUser(
@@ -59,9 +62,13 @@ export class WebhookService {
           order.email
         );
 
-        const productName = this.extractProductName((order as Order).line_items);
+        const productName = this.extractProductName(
+          (order as Order).line_items
+        );
 
-        const { id: productId } = await this.productService.findOne(productName)
+        const { id: productId } = await this.productService.findOne(
+          productName
+        );
 
         await this.createOrder(order as Order, user.id, productId);
       }
@@ -82,7 +89,9 @@ export class WebhookService {
           order.email
         );
 
-        const { id: productId } = await this.productService.findOne(productName)
+        const { id: productId } = await this.productService.findOne(
+          productName
+        );
 
         await this.createOrder(order as Order, user.id, productId);
 
@@ -91,7 +100,7 @@ export class WebhookService {
         };
       }
 
-      const { id: productId } = await this.productService.findOne(productName)
+      const { id: productId } = await this.productService.findOne(productName);
 
       await this.createOrder(order as Order, userExists.id, productId);
 
@@ -117,6 +126,10 @@ export class WebhookService {
       productId,
       trackingNumber: order.tracking_number?.toString() || null,
       userId,
+      shippingProvider: order?.fulfillments[0]?.tracking_company || null,
+      shippingDate: order?.fulfillments[0]?.created_at
+        ? new Date(order?.fulfillments[0]?.created_at)
+        : null,
     });
   }
 
