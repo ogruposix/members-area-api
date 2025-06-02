@@ -22,9 +22,7 @@ export class WebhookController {
     @Body() payload: WebhookPayload,
     @Req() req: Request
   ): Promise<WebhookResponse> {
-    const host = req.headers["host"];
-
-    console.log("Host", host);
+    console.log(Headers, req.headers);
 
     console.log(
       payload.order.id,
