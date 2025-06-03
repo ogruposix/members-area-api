@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  HttpCode,
-  HttpStatus,
-  Req,
-} from "@nestjs/common";
+import { Body, Controller, Post, HttpCode, HttpStatus } from "@nestjs/common";
 import { WebhookService } from "./webhook.service";
 import { WebhookPayload } from "./types/webhook-payload";
 import { Public } from "src/decorators/public.decorator";
@@ -18,19 +11,21 @@ export class WebhookController {
   @Public()
   @Post("paid-order")
   @HttpCode(HttpStatus.OK)
-  async paidOrder(
-    @Body() payload: WebhookPayload,
-    @Req() req: any
-  ): Promise<WebhookResponse> {
-    console.log("Raw Headers", req.rawHeaders);
-
+  async paidOrder(@Body() payload: WebhookPayload): Promise<WebhookResponse> {
     console.log(
+      "OrderId:",
       payload.order.id,
+      "Tracking Number:",
       payload.order.tracking_number,
+      "First Name:",
       payload.order.customer.first_name,
+      "Email:",
       payload.order.email,
+      "Tracking Company:",
       payload.order?.fulfillments[0]?.tracking_company || null,
+      "Created At:",
       payload.order?.fulfillments[0]?.created_at || null,
+      "Items Title:",
       payload.order.line_items.map((item) => item.title)
     );
     return await this.webhookService.paidOrder(payload);

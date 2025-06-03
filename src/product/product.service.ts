@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Product } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
@@ -10,7 +10,7 @@ export class ProductService {
     return this.prisma.product.findMany();
   }
 
-  async create(product: Product) {
+  async create(product: Prisma.ProductCreateInput) {
     return this.prisma.product.create({
       data: product,
     });
