@@ -22,6 +22,7 @@ interface Order {
   line_items: OrderLineItem[];
   tracking_number: string | null;
   fulfillments: Fulfillment[];
+  created_at: string;
   [key: string]: any;
 }
 
@@ -65,6 +66,8 @@ export class WebhookService {
         const productName = this.extractProductName(
           (order as Order).line_items
         );
+
+        console.log(productName);
 
         const { id: productId } = await this.productService.findOne(
           Array.isArray(productName) ? productName[0] : productName
@@ -126,6 +129,7 @@ export class WebhookService {
       productId,
       trackingNumber: order.tracking_number?.toString() || null,
       userId,
+      createdAt: new Date(order.created_at),
       shippingProvider: order?.fulfillments[0]?.tracking_company || null,
       shippingDate: order?.fulfillments[0]?.created_at
         ? new Date(order?.fulfillments[0]?.created_at)

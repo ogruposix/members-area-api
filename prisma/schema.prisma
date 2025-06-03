@@ -16,16 +16,18 @@ model User {
   updatedAt DateTime? @updatedAt
   imageUrl  String?
   password  String?
-  orders    Order[]
+
+  orders Order[]
 }
 
 model Product {
   id        String      @id @default(uuid())
   name      String
   type      ProductType
-  createdAt DateTime?   @default(now())
+  createdAt DateTime?
   updatedAt DateTime?   @updatedAt
-  orders    Order[]
+
+  orders Order[]
 }
 
 model Order {
@@ -37,8 +39,9 @@ model Order {
   productId        String?
   shippingDate     DateTime?
   shippingProvider String?
-  product          Product?  @relation(fields: [productId], references: [id])
-  user             User      @relation(fields: [userId], references: [id])
+
+  product Product? @relation(fields: [productId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
 }
 
 enum Role {
