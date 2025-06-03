@@ -55,5 +55,6 @@ enum ProductType {
   PROSTATE
   NEUROPATHY
   MEMORY
+  PAIN
   DIABETES
 }
