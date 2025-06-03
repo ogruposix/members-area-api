@@ -34,7 +34,7 @@ model Order {
   id               String    @id
   userId           String
   trackingNumber   String?
-  createdAt        DateTime
+  createdAt        DateTime?
   updatedAt        DateTime? @updatedAt
   productId        String?
   shippingDate     DateTime?
