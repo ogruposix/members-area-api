@@ -1,3 +1,4 @@
+import { Body, Controller, Post, HttpCode, HttpStatus } from "@nestjs/common";
 import {
   Body,
   Controller,
@@ -17,10 +18,10 @@ export class WebhookController {
   @Public()
   @Post("paid-order")
   @HttpCode(HttpStatus.OK)
+  async paidOrder(@Body() payload: WebhookPayload): Promise<WebhookResponse> {
   async paidOrder(
     @Body() payload: WebhookPayload
   ): Promise<WebhookResponse> {
-
     console.log(
       "OrderId:",
       payload.order.id,

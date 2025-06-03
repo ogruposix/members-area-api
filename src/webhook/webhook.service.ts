@@ -67,7 +67,7 @@ export class WebhookService {
         );
 
         const { id: productId } = await this.productService.findOne(
-          productName
+          Array.isArray(productName) ? productName[0] : productName
         );
 
         await this.createOrder(order as Order, user.id, productId);
