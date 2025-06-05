@@ -14,7 +14,7 @@ export class FileService {
     this.client = new Minio.Client({
       endPoint: this.configService.get("MINIO_ENDPOINT")!,
       port: this.configService.get("MINIO_PORT")!,
-      useSSL: false,
+      useSSL: true,
       accessKey: this.configService.get("MINIO_ACCESS_KEY")!,
       secretKey: this.configService.get("MINIO_SECRET_KEY")!,
     });
