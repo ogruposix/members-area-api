@@ -6,6 +6,8 @@ import {
 import { Order, Role, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from "bcrypt";
+import { InjectRedis } from "@nestjs-modules/ioredis";
+import Redis from "ioredis";
 interface PaginationParams {
   page?: number;
   limit?: number;
@@ -24,7 +26,10 @@ export interface PaginatedResponse<T> {
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @InjectRedis() private readonly redis: Redis
+  ) {}
 
   async createUser(name: string, email: string, role?: Role): Promise<User> {
     const userAlreadyExists = await this.prisma.user.findUnique({
@@ -57,6 +62,12 @@ export class UserService {
   }
 
   async getUserById(userId: string): Promise<Partial<User>> {
+    let cachedUser = await this.redis.get(`user:${userId}`);
+
+    if (cachedUser) {
+      return JSON.parse(cachedUser);
+    }
+
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -69,12 +80,17 @@ export class UserService {
         createdAt: true,
         updatedAt: true,
         imageUrl: true,
+        orders: true,
       },
     });
 
     if (!user) {
       throw new NotFoundException(`User not found`);
     }
+
+    // Cache the user data
+    await this.redis.set(`user:${userId}`, JSON.stringify(user), "EX", 3600); // Cache for 1 hour
+    // Return the user data
 
     return user;
   }

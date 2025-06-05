@@ -24,6 +24,8 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
 
+    console.log("User found:", user);
+
     // if (user.role === "ADMIN" && user.password && !password) {
     //   throw new UnauthorizedException("Password is required");
     // }
