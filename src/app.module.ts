@@ -10,6 +10,7 @@ import { OrderModule } from "./order/order.module";
 import { UserModule } from "./user/user.module";
 import { FileModule } from "./file/file.module";
 import { ProductModule } from "./product/product.module";
+import { EbookModule } from './ebook/ebook.module';
 import { RedisModule } from "@nestjs-modules/ioredis";
 
 @Module({
@@ -23,6 +24,7 @@ import { RedisModule } from "@nestjs-modules/ioredis";
     UserModule,
     FileModule,
     ProductModule,
+    EbookModule,
     RedisModule.forRoot({
       type: "single",
       url: process.env.REDIS_URL || "redis://localhost:6379",
