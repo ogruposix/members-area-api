@@ -35,7 +35,7 @@ export class FileService {
       "GET",
       this.configService.get("MINIO_BUCKET_NAME")!,
       ebook.title,
-      7 * 24 * 60 * 60
+      7 * 24 * 60 * 60 // 7 days
     );
 
     return url;
@@ -52,7 +52,7 @@ export class FileService {
       "GET",
       this.configService.get("MINIO_BUCKET_NAME")!,
       file.originalname,
-      7 * 24 * 60 * 60
+      7 * 24 * 60 * 60 // 7 days
     );
 
     return {
