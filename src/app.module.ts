@@ -10,6 +10,7 @@ import { OrderModule } from "./order/order.module";
 import { UserModule } from "./user/user.module";
 import { FileModule } from "./file/file.module";
 import { ProductModule } from "./product/product.module";
+import { RedisModule } from "@nestjs-modules/ioredis";
 
 @Module({
   imports: [
@@ -22,6 +23,10 @@ import { ProductModule } from "./product/product.module";
     UserModule,
     FileModule,
     ProductModule,
+    RedisModule.forRoot({
+      type: "single",
+      url: process.env.REDIS_URL || "redis://localhost:6379",
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
