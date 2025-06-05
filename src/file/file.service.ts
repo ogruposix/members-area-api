@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import * as Minio from "minio";
 import { PrismaService } from "src/prisma/prisma.service";
 
@@ -6,13 +7,16 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class FileService {
   private client: Minio.Client;
 
-  constructor(private readonly prismaService: PrismaService) {
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService
+  ) {
     this.client = new Minio.Client({
-      endPoint: "members-area-minio-c03ed7-64-227-108-129.traefik.me",
-      port: 9000,
+      endPoint: this.configService.get("MINIO_ENDPOINT")!,
+      port: this.configService.get("MINIO_PORT")!,
       useSSL: false,
-      accessKey: "9Dt6zU3zkt7kMU7NSjhj",
-      secretKey: "mDKBuGfTs8kXJ02ZXTh1wPmBpQ4Q0r350PRh8dtT",
+      accessKey: this.configService.get("MINIO_ACCESS_KEY")!,
+      secretKey: this.configService.get("MINIO_SECRET_KEY")!,
     });
   }
 
@@ -29,7 +33,7 @@ export class FileService {
 
     const url = await this.client.presignedUrl(
       "GET",
-      "members-area-pdf",
+      this.configService.get("MINIO_BUCKET_NAME")!,
       ebook.title,
       7 * 24 * 60 * 60
     );
@@ -39,14 +43,14 @@ export class FileService {
 
   async uploadFile(file: Express.Multer.File) {
     await this.client.putObject(
-      "members-area-pdf",
+      this.configService.get("MINIO_BUCKET_NAME")!,
       file.originalname,
       file.buffer
     );
 
     const url = await this.client.presignedUrl(
       "GET",
-      "members-area-pdf",
+      this.configService.get("MINIO_BUCKET_NAME")!,
       file.originalname,
       7 * 24 * 60 * 60
     );

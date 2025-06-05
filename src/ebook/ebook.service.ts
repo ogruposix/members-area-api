@@ -51,12 +51,12 @@ export class EbookService {
 
     const processedEbooks = await Promise.all(
       ebooks.map(async (ebook) => {
-        // Se não tem pdfUrlCreatedAt ou se passou de 7 dias, gera nova URL
+        // If the ebook has no pdfUrlCreatedAt or if it's older than 7 days, generate a new URL
         if (!ebook.pdfUrlCreatedAt || ebook.pdfUrlCreatedAt < sevenDaysAgo) {
           try {
             const newUrl = await this.fileService.generateNewUrl(ebook.id);
 
-            // Atualiza o ebook no banco com a nova URL e timestamp
+            // Update the ebook in the database with the new URL and timestamp
             const updatedEbook = await this.prisma.ebook.update({
               where: { id: ebook.id },
               data: {
@@ -67,13 +67,12 @@ export class EbookService {
 
             return updatedEbook;
           } catch (error) {
-            // Se der erro ao gerar URL, retorna o ebook original
             console.error(`Erro ao gerar URL para ebook ${ebook.id}:`, error);
             return ebook;
           }
         }
 
-        // Se a URL ainda é válida, retorna o ebook sem modificações
+        // If the URL is still valid, return the ebook without modifications
         return ebook;
       })
     );

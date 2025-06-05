@@ -41,7 +41,7 @@ export class EbookController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({
-            maxSize: 1024 * 1024 * 60, // 60MB
+            maxSize: 1024 * 1024 * 100, // 100MB
           }),
           new FileTypeValidator({
             fileType: ".(pdf)",
