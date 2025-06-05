@@ -1,41 +1,58 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { randomUUID } from "crypto";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import * as Minio from "minio";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class FileService {
-  private client: S3Client;
+  private client: Minio.Client;
 
-  constructor(private configService: ConfigService) {
-    const accountId = configService.get("CLOUDFARE_ACCOUNT_ID");
-
-    this.client = new S3Client({
-      endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-      region: "auto",
-      credentials: {
-        accessKeyId: configService.get("AWS_ACCESS_KEY_ID")!,
-        secretAccessKey: configService.get("AWS_SECRET_ACCESS_KEY")!,
-      },
+  constructor(private readonly prismaService: PrismaService) {
+    this.client = new Minio.Client({
+      endPoint: "members-area-minio-c03ed7-64-227-108-129.traefik.me",
+      port: 9000,
+      useSSL: false,
+      accessKey: "9Dt6zU3zkt7kMU7NSjhj",
+      secretKey: "mDKBuGfTs8kXJ02ZXTh1wPmBpQ4Q0r350PRh8dtT",
     });
   }
 
-  async uploadFile(file: Express.Multer.File) {
-    const uploadId = randomUUID();
+  async generateNewUrl(ebookId: string) {
+    const ebook = await this.prismaService.ebook.findUnique({
+      where: {
+        id: ebookId,
+      },
+    });
 
-    await this.client.send(
-      new PutObjectCommand({
-        Bucket: this.configService.get("AWS_BUKET_NAME")!,
-        Key: `${uploadId}-${file.originalname}`,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      })
+    if (!ebook) {
+      throw new NotFoundException("Ebook not found");
+    }
+
+    const url = await this.client.presignedUrl(
+      "GET",
+      "members-area-pdf",
+      ebook.title,
+      7 * 24 * 60 * 60
+    );
+
+    return url;
+  }
+
+  async uploadFile(file: Express.Multer.File) {
+    await this.client.putObject(
+      "members-area-pdf",
+      file.originalname,
+      file.buffer
+    );
+
+    const url = await this.client.presignedUrl(
+      "GET",
+      "members-area-pdf",
+      file.originalname,
+      7 * 24 * 60 * 60
     );
 
     return {
-      url: `${this.configService.get("CLOUDFARE_URL")}/${uploadId}-${
-        file.originalname
-      }`,
+      url,
     };
   }
 }

@@ -10,6 +10,7 @@ import { OrderModule } from "./order/order.module";
 import { UserModule } from "./user/user.module";
 import { FileModule } from "./file/file.module";
 import { ProductModule } from "./product/product.module";
+import { EbookModule } from './ebook/ebook.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProductModule } from "./product/product.module";
     UserModule,
     FileModule,
     ProductModule,
+    EbookModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -2,6 +2,7 @@ import {
   Controller,
   FileTypeValidator,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Post,
   UploadedFile,
@@ -10,7 +11,6 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileService } from "./file.service";
 import { Role } from "src/decorators/roles.decorator";
-import { ActiveUserId } from "src/decorators/active-user-id";
 import { PrismaService } from "src/prisma/prisma.service";
 
 @Role("ADMIN")
@@ -21,32 +21,33 @@ export class FileController {
     private readonly prismaService: PrismaService
   ) {}
 
-  @Post("upload")
+  @Post("upload/:ebookId")
   @UseInterceptors(FileInterceptor("file"))
   async uploadFile(
     @UploadedFile(
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({
-            maxSize: 1024 * 1024 * 2, // 2MB
+            maxSize: 1024 * 1024 * 60, // 60MB
           }),
           new FileTypeValidator({
-            fileType: ".(png|jpg|jpeg)",
+            fileType: ".(pdf)",
           }),
         ],
       })
     )
     file: Express.Multer.File,
-    @ActiveUserId() userId: string
+    @Param("ebookId") ebookId: string
   ) {
     const { url } = await this.fileService.uploadFile(file);
 
-    await this.prismaService.user.update({
+    await this.prismaService.ebook.update({
       where: {
-        id: userId,
+        id: ebookId,
       },
       data: {
-        imageUrl: url,
+        pdfUrl: url,
+        pdfUrlCreatedAt: new Date(),
       },
     });
 
