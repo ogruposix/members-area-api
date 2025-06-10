@@ -1,62 +1,49 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import * as Minio from "minio";
-import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class FileService {
-  private client: Minio.Client;
+  private filesPath: string;
+  private baseUrl: string;
 
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly configService: ConfigService
-  ) {
-    this.client = new Minio.Client({
-      endPoint: this.configService.get("MINIO_ENDPOINT")!,
-      port: this.configService.get("MINIO_PORT")!,
-      useSSL: false,
-      accessKey: this.configService.get("MINIO_ACCESS_KEY")!,
-      secretKey: this.configService.get("MINIO_SECRET_KEY")!,
-    });
+  constructor(private readonly configService: ConfigService) {
+    this.filesPath = this.configService.get<string>("FILES_PATH") || "/files";
+    this.baseUrl =
+      this.configService.get<string>("BASE_URL") || "http://localhost:3000";
   }
 
-  async generateNewUrl(ebookId: string) {
-    const ebook = await this.prismaService.ebook.findUnique({
-      where: {
-        id: ebookId,
-      },
-    });
-
-    if (!ebook) {
-      throw new NotFoundException("Ebook not found");
+  async uploadEbookFile(file: Express.Multer.File) {
+    if (!file) {
+      throw new NotFoundException("File not found");
     }
 
-    const url = await this.client.presignedUrl(
-      "GET",
-      this.configService.get("MINIO_BUCKET_NAME")!,
-      ebook.title,
-      7 * 24 * 60 * 60 // 7 days
-    );
+    if (!file.mimetype || !file.mimetype.includes("pdf")) {
+      throw new NotFoundException(
+        "Invalid file type. Only PDF files are allowed."
+      );
+    }
 
-    return url;
-  }
+    if (file.size > 1024 * 1024 * 100) {
+      throw new NotFoundException(
+        "File size exceeds the maximum limit of 100MB."
+      );
+    }
 
-  async uploadFile(file: Express.Multer.File) {
-    await this.client.putObject(
-      this.configService.get("MINIO_BUCKET_NAME")!,
-      file.originalname,
-      file.buffer
-    );
+    const fileName = `${Date.now()}-${file.originalname}`;
 
-    const url = await this.client.presignedUrl(
-      "GET",
-      this.configService.get("MINIO_BUCKET_NAME")!,
-      file.originalname,
-      7 * 24 * 60 * 60 // 7 days
-    );
+    const fs = require("fs");
+    const path = require("path");
+    const dir = path.join(this.filesPath, "ebooks");
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, {
+        recursive: true,
+      });
+    }
+    fs.writeFileSync(path.join(dir, fileName), file.buffer);
 
     return {
-      url,
+      url: `${this.baseUrl}/files/ebooks/${fileName}`,
     };
   }
 }
