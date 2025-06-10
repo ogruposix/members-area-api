@@ -17,9 +17,10 @@ export class FileController {
   ) {
     const ebookFile = await this.fileService.getEbookFile(filename);
 
+    // as download
     res.set({
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${filename}"`,
+      "Content-Disposition": `attachment; filename="${filename}"`,
     });
 
     ebookFile.pipe(res);
