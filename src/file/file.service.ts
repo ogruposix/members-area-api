@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { ReadStream } from "fs";
 
 @Injectable()
 export class FileService {
@@ -45,5 +46,18 @@ export class FileService {
     return {
       url: `${this.baseUrl}/files/ebooks/${fileName}`,
     };
+  }
+
+  async getEbookFile(fileName: string): Promise<ReadStream> {
+    const fs = require("fs");
+    const path = require("path");
+    const filePath = path.join(this.filesPath, "ebooks", fileName);
+
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException("File not found");
+    }
+
+    const fileStream = fs.createReadStream(filePath);
+    return fileStream;
   }
 }
