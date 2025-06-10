@@ -2,7 +2,9 @@ import { Controller, Get, Param, Res } from "@nestjs/common";
 import { Role } from "src/decorators/roles.decorator";
 import { FileService } from "./file.service";
 import { Response } from "express";
+import { Public } from "src/decorators/public.decorator";
 
+@Public()
 @Controller("files")
 export class FileController {
   constructor(private readonly fileService: FileService) {}
