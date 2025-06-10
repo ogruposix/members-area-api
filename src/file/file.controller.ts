@@ -3,7 +3,6 @@ import { Role } from "src/decorators/roles.decorator";
 import { FileService } from "./file.service";
 import { Response } from "express";
 
-@Role("ADMIN")
 @Controller("files")
 export class FileController {
   constructor(private readonly fileService: FileService) {}
