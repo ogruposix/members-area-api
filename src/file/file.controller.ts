@@ -8,8 +8,8 @@ import { Response } from "express";
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
-  // /files/ebook/:filename.pdf
-  @Get("ebook/:filename")
+  // /files/ebooks/:filename.pdf
+  @Get("ebooks/:filename")
   async getEbookFile(
     @Param("filename") filename: string,
     @Res() res: Response
