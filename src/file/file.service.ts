@@ -60,4 +60,16 @@ export class FileService {
     const fileStream = fs.createReadStream(filePath);
     return fileStream;
   }
+
+  async deleteEbookFile(fileName: string): Promise<void> {
+    const fs = require("fs");
+    const path = require("path");
+    const filePath = path.join(this.filesPath, "ebooks", fileName);
+
+    if (!fs.existsSync(filePath)) {
+      throw new NotFoundException("File not found");
+    }
+
+    fs.unlinkSync(filePath);
+  }
 }

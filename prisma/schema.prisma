@@ -49,6 +49,7 @@ model Ebook {
   id              String    @id @default(uuid())
   title           String
   description     String
+  fileName        String?
   pdfUrlCreatedAt DateTime?
   pdfUrl          String?
   createdAt       DateTime? @default(now())

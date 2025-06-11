@@ -33,6 +33,24 @@ export class EbookService {
     });
   }
 
+  async deleteEbook(id: string) {
+    const ebook = await this.prisma.ebook.findUnique({
+      where: { id },
+    });
+
+    if (!ebook) {
+      throw new Error("Ebook not found");
+    }
+
+    if (ebook.fileName) {
+      await this.fileService.deleteEbookFile(ebook.fileName);
+    }
+
+    return this.prisma.ebook.delete({
+      where: { id },
+    });
+  }
+
   async getUserEbooks(userId: string) {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);

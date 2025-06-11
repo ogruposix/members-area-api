@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
@@ -61,5 +62,11 @@ export class EbookController {
     @Body() ebook: Prisma.EbookUpdateInput
   ) {
     return this.ebookService.updateEbook(id, ebook);
+  }
+
+  @Role("ADMIN")
+  @Delete(":id")
+  async deleteEbook(@Param("id") id: string) {
+    return this.ebookService.deleteEbook(id);
   }
 }
