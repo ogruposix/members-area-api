@@ -45,6 +45,7 @@ export class FileService {
 
     return {
       url: `${this.baseUrl}/files/ebooks/${fileName}`,
+      fileName,
     };
   }
 

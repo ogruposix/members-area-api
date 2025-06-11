@@ -15,11 +15,12 @@ export class EbookService {
   }
 
   async createEbook(ebook: Prisma.EbookCreateInput, file: Express.Multer.File) {
-    const { url } = await this.fileService.uploadEbookFile(file);
+    const { url, fileName } = await this.fileService.uploadEbookFile(file);
 
     return this.prisma.ebook.create({
       data: {
         ...ebook,
+        fileName,
         pdfUrl: url,
         pdfUrlCreatedAt: new Date(),
       },
