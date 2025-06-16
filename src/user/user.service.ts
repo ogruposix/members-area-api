@@ -58,6 +58,9 @@ export class UserService {
       where: {
         userId,
       },
+      include: {
+        product: true,
+      },
     });
   }
 
