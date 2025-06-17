@@ -22,4 +22,10 @@ export class ProductController {
   async getProductId(@Param("name") name: string) {
     return this.productService.findOne(name);
   }
+
+  @Role("ADMIN")
+  @Get("ebook/:ebookId")
+  async getEbook(@Param("ebookId") ebookId: string) {
+    return this.productService.getProductByEbookId(ebookId);
+  }
 }
