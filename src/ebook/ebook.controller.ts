@@ -4,6 +4,7 @@ import {
   Delete,
   FileTypeValidator,
   Get,
+  Logger,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -20,6 +21,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("ebook")
 export class EbookController {
+  private readonly logger = new Logger(EbookController.name);
   constructor(private readonly ebookService: EbookService) {}
 
   @Role("ADMIN")
@@ -50,8 +52,10 @@ export class EbookController {
         ],
       })
     )
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    @ActiveUserId() userId: string
   ) {
+    this.logger.log(`User ${userId} is creating a new ebook`);
     return this.ebookService.createEbook(ebook, file);
   }
 
@@ -59,14 +63,17 @@ export class EbookController {
   @Put(":id")
   async updateEbook(
     @Param("id") id: string,
-    @Body() ebook: Prisma.EbookUpdateInput
+    @Body() ebook: Prisma.EbookUpdateInput,
+    @ActiveUserId() userId: string
   ) {
+    this.logger.log(`User ${userId} is updating ebook with ID: ${id}`);
     return this.ebookService.updateEbook(id, ebook);
   }
 
   @Role("ADMIN")
   @Delete(":id")
-  async deleteEbook(@Param("id") id: string) {
+  async deleteEbook(@Param("id") id: string, @ActiveUserId() userId: string) {
+    this.logger.log(`User ${userId} is deleting ebook with ID: ${id}`);
     return this.ebookService.deleteEbook(id);
   }
 }
