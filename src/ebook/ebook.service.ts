@@ -13,7 +13,11 @@ export class EbookService {
   ) {}
 
   async getEbooks() {
-    return this.prisma.ebook.findMany();
+    return this.prisma.ebook.findMany({
+      include: {
+        product: true,
+      }
+    });
   }
 
   async createEbook(ebook: Prisma.EbookCreateInput, file: Express.Multer.File) {
