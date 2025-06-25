@@ -68,4 +68,6 @@ enum ProductType {
   MEMORY
   DIABETES
   PAIN
+  REJUVENATION
+  GUT_HEALTH
 }
