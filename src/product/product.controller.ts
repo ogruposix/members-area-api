@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Logger, Param, Patch, Post } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { Prisma } from "@prisma/client";
 import { Role } from "src/decorators/roles.decorator";
@@ -27,5 +27,14 @@ export class ProductController {
   @Get(":name")
   async getProductId(@Param("name") name: string) {
     return this.productService.findOne(name);
+  }
+
+  @Role("ADMIN")
+  @Patch(":id")
+  async update(
+    @Param("id") id: string,
+    @Body() product: Prisma.ProductUpdateInput,
+  ) {
+    return this.productService.update(id, product);
   }
 }
