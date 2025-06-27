@@ -36,8 +36,5 @@ export class ProductController {
     @Body() product: Prisma.ProductUpdateInput,
   ) {
     return this.productService.update(id, product);
-  @Get("ebook/:ebookId")
-  async getEbook(@Param("ebookId") ebookId: string) {
-    return this.productService.getProductByEbookId(ebookId);
   }
 }
