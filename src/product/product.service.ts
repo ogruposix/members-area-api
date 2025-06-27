@@ -57,5 +57,16 @@ export class ProductService {
       },
       data: product
     })
+
+  async getProductByEbookId(ebookId: string) {
+    return this.prisma.product.findFirst({
+      where: {
+        ebooks: {
+          some: {
+            id: ebookId,
+          },
+        },
+      },
+    });
   }
 }

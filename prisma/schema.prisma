@@ -16,7 +16,8 @@ model User {
   updatedAt DateTime? @updatedAt
   imageUrl  String?
   password  String?
-  orders    Order[]
+
+  orders Order[]
 }
 
 model Product {
@@ -25,8 +26,9 @@ model Product {
   type      ProductType
   createdAt DateTime?   @default(now())
   updatedAt DateTime?   @updatedAt
-  ebooks    Ebook[]
-  orders    Order[]
+
+  ebooks Ebook[]
+  orders Order[]
 }
 
 model Order {
@@ -38,8 +40,9 @@ model Order {
   productId        String?
   shippingDate     DateTime?
   shippingProvider String?
-  product          Product?  @relation(fields: [productId], references: [id])
-  user             User      @relation(fields: [userId], references: [id])
+
+  product Product? @relation(fields: [productId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
 }
 
 model Ebook {
@@ -52,7 +55,8 @@ model Ebook {
   createdAt       DateTime? @default(now())
   updatedAt       DateTime? @updatedAt
   productId       String
-  product         Product   @relation(fields: [productId], references: [id])
+
+  product Product @relation(fields: [productId], references: [id])
 }
 
 enum Role {
