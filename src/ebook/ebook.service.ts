@@ -15,12 +15,16 @@ export class EbookService {
   async getEbooks() {
     return this.prisma.ebook.findMany({
       include: {
-        product: true,
+        products: {
+          include: {
+            product: true
+          }
+        }
       }
     });
   }
 
-  async createEbook(ebook: Prisma.EbookCreateInput, file: Express.Multer.File) {
+  async createEbook(ebook: Prisma.EbookCreateInput, productIds: string[], file: Express.Multer.File) {
     const { url, fileName } = await this.fileService.uploadEbookFile(file);
 
     return this.prisma.ebook.create({
@@ -29,7 +33,25 @@ export class EbookService {
         fileName,
         pdfUrl: url,
         pdfUrlCreatedAt: new Date(),
+        products: {
+          create: productIds.map((id) => {
+            return {
+              product: {
+                connect: {
+                  id
+                }
+              }
+            }
+          })
+        },
       },
+      include: {
+        products: {
+          include: {
+            product: true
+          }
+        }
+      }
     });
   }
 
@@ -64,10 +86,14 @@ export class EbookService {
 
     const ebooks = await this.prisma.ebook.findMany({
       where: {
-        product: {
-          orders: {
-            some: {
-              userId,
+        products: {
+          some: {
+            product: {
+              orders: {
+                some: {
+                  userId,
+                },
+              },
             },
           },
         },
