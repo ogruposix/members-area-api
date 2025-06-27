@@ -8,6 +8,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import * as bcrypt from "bcrypt";
 import { InjectRedis } from "@nestjs-modules/ioredis";
 import Redis from "ioredis";
+import { CartpandaService } from "src/cartpanda/cartpanda.service";
 interface PaginationParams {
   page?: number;
   limit?: number;
@@ -28,6 +29,7 @@ export interface PaginatedResponse<T> {
 export class UserService {
   constructor(
     private prisma: PrismaService,
+    private readonly cartpanda: CartpandaService,
     @InjectRedis() private readonly redis: Redis
   ) {}
 
@@ -54,11 +56,38 @@ export class UserService {
   }
 
   async getOrdersByUserId(userId: string): Promise<Order[]> {
-    return await this.prisma.order.findMany({
+    const dbOrders = await this.prisma.order.findMany({
       where: {
         userId,
       },
+      include: {
+        product: true,
+      },
     });
+
+    if (!dbOrders || dbOrders.length === 0) {
+      throw new NotFoundException(`No orders found for user with ID ${userId}`);
+    }
+
+    const orderSums: any[] = [];
+
+    for (const order of dbOrders) {
+      // Fetch order details from CartPanda
+      const cartpandaOrder = await this.cartpanda.getOrderById(order.id);
+      if (!cartpandaOrder) {
+        throw new NotFoundException(
+          `Order with ID ${order.id} not found in CartPanda`
+        );
+      }
+
+      // Update the order with CartPanda data
+      orderSums.push({
+        ...order,
+        items: cartpandaOrder.order.line_items,
+      });
+    }
+
+    return orderSums;
   }
 
   async getUserById(userId: string): Promise<Partial<User>> {

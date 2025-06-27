@@ -50,6 +50,14 @@ export class ProductService {
     return product;
   }
 
+  async update(id: string, product: Prisma.ProductUpdateInput) {
+    return this.prisma.product.update({
+      where: {
+        id
+      },
+      data: product
+    })
+
   async getProductByEbookId(ebookId: string) {
     return this.prisma.product.findFirst({
       where: {

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Put,
+  Query,
+} from "@nestjs/common";
 import { UserService, PaginatedResponse } from "./user.service";
 import { ActiveUserId } from "src/decorators/active-user-id";
 import { Public } from "src/decorators/public.decorator";
@@ -14,6 +23,7 @@ interface PaginationQuery {
 
 @Controller("user")
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
   constructor(private readonly userService: UserService) {}
 
   @Get("/orders")
@@ -28,7 +38,13 @@ export class UserController {
 
   @Public()
   @Post("/create")
-  async createUser(@Body() body: CreateUserDto) {
+  async createUser(
+    @Body() body: CreateUserDto,
+    @ActiveUserId() userId: string
+  ) {
+    this.logger.log(
+      `User ${userId} is creating a new user with email: ${body.email}`
+    );
     return await this.userService.createUser(body.name, body.email, body.role);
   }
 
@@ -66,8 +82,10 @@ export class UserController {
   @Put("update")
   async updateUser(
     @ActiveUserId() userId: string,
-    @Body() data: Partial<User>
+    @Body() data: Partial<User>,
+    @ActiveUserId() activeUserId: string
   ) {
+    this.logger.log(`User ${activeUserId} is updating user with ID: ${userId}`);
     await this.userService.updateUser(userId, data);
   }
 }

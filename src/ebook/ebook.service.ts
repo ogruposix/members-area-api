@@ -1,17 +1,23 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { FileService } from "src/file/file.service";
 
 @Injectable()
 export class EbookService {
+  private readonly logger = new Logger(EbookService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileService: FileService
   ) {}
 
   async getEbooks() {
-    return this.prisma.ebook.findMany();
+    return this.prisma.ebook.findMany({
+      include: {
+        product: true,
+      }
+    });
   }
 
   async createEbook(ebook: Prisma.EbookCreateInput, file: Express.Multer.File) {

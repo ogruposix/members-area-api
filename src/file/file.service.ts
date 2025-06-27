@@ -30,7 +30,7 @@ export class FileService {
       );
     }
 
-    const fileName = `${file.originalname}-${Date.now()}`;
+    const fileName = `${Date.now()}-${file.originalname}`;
 
     const fs = require("fs");
     const path = require("path");
