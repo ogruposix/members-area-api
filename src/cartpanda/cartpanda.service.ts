@@ -38,6 +38,7 @@ export class CartpandaService {
   async getOrderById(orderId: string): Promise<{
     order: {
       id: string;
+      r;
       line_items: Array<{
         id: string;
         name: string;
