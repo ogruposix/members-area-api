@@ -4,6 +4,8 @@ import {
   // UnauthorizedException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { CartpandaService } from "src/cartpanda/cartpanda.service";
+import { OrderService } from "src/order/order.service";
 import { UserService } from "src/user/user.service";
 // import * as bcrypt from "bcrypt";
 
@@ -11,21 +13,35 @@ import { UserService } from "src/user/user.service";
 export class AuthService {
   constructor(
     private userService: UserService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private readonly cartpandaService: CartpandaService,
+    private readonly orderService: OrderService
   ) {}
 
   async signIn(
     email: string,
     password?: string
   ): Promise<{ access_token: string }> {
-    const user = await this.userService.findOne(email);
+    let user = await this.userService.findOne(email);
 
     if (!user) {
-      throw new NotFoundException("User not found");
+      const cartpandaUser = await this.cartpandaService.getCustomerByEmail(
+        email
+      );
+
+      if (!cartpandaUser) {
+        throw new NotFoundException("User not found");
+      }
+
+      // If the user is not found in the local database, create a new user in the local database
+      user = await this.userService.createUser(
+        cartpandaUser.first_name + " " + cartpandaUser.last_name,
+        cartpandaUser.email,
+        "USER" // Default role for CartPanda users
+      );
     }
 
-    console.log("User found:", user);
-
+    this.orderService.updateOrdersForUser(user.email);
     // if (user.role === "ADMIN" && user.password && !password) {
     //   throw new UnauthorizedException("Password is required");
     // }

@@ -6,6 +6,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./auth.guard";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { CartpandaModule } from "src/cartpanda/cartpanda.module";
+import { OrderModule } from "src/order/order.module";
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
       }),
       inject: [ConfigService],
     }),
+    CartpandaModule,
+    OrderModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, { provide: APP_GUARD, useClass: AuthGuard }],
