@@ -93,6 +93,18 @@ export class OrderService {
           },
         });
 
+        const orderCheck = await this.prisma.order.findUnique({
+          where: {
+            id: `${order.id}`,
+          },
+        });
+
+        if (orderCheck && orderCheck.userId !== user.id) {
+          await this.updateOrder(orderCheck.id, {
+            userId: user.id,
+          });
+          continue;
+        }
         // last fullfullment by created_at
         const lastFulfillment = order.fulfillments?.sort(
           (a, b) =>
