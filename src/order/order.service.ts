@@ -103,9 +103,9 @@ export class OrderService {
           id: `${order.id}`,
           userId: user.id,
           productId: product?.id,
-          trackingNumber: lastFulfillment.tracking_number || null,
-          shippingProvider: lastFulfillment.tracking_company || null,
-          shippingDate: lastFulfillment.created_at,
+          trackingNumber: lastFulfillment?.tracking_number || null,
+          shippingProvider: lastFulfillment?.tracking_company || null,
+          shippingDate: lastFulfillment?.created_at,
           createdAt: new Date(order.created_at),
           updatedAt: new Date(order.created_at),
         });
@@ -120,9 +120,9 @@ export class OrderService {
           lastFulfillment?.tracking_number !== existingOrder.trackingNumber
         ) {
           await this.updateOrder(existingOrder.id, {
-            trackingNumber: lastFulfillment.tracking_number,
-            shippingProvider: lastFulfillment.tracking_company || null,
-            shippingDate: new Date(lastFulfillment.created_at),
+            trackingNumber: lastFulfillment?.tracking_number,
+            shippingProvider: lastFulfillment?.tracking_company || null,
+            shippingDate: new Date(lastFulfillment?.created_at),
             updatedAt: new Date(),
           });
         }
