@@ -22,11 +22,12 @@ export class AuthService {
     email: string,
     password?: string
   ): Promise<{ access_token: string }> {
-    let user = await this.userService.findOne(email);
+    const emailSanitized = email.trim().toLowerCase();
+    let user = await this.userService.findOne(emailSanitized);
 
     if (!user) {
       const cartpandaUser = await this.cartpandaService.getCustomerByEmail(
-        email
+        emailSanitized
       );
 
       if (!cartpandaUser) {
