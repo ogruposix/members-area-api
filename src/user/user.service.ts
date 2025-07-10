@@ -9,6 +9,7 @@ import * as bcrypt from "bcrypt";
 import { InjectRedis } from "@nestjs-modules/ioredis";
 import Redis from "ioredis";
 import { CartpandaService } from "src/cartpanda/cartpanda.service";
+import { equal } from "assert";
 interface PaginationParams {
   page?: number;
   limit?: number;
@@ -127,9 +128,12 @@ export class UserService {
   }
 
   async findOne(email: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: {
-        email,
+        email: {
+          equals: email,
+          mode: "insensitive",
+        },
       },
     });
 
