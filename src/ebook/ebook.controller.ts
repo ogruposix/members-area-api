@@ -28,7 +28,7 @@ interface CreateEbookDto {
 export interface EbookUpdateDto {
   title?: string;
   description?: string;
-  productIds?: string;
+  productIds?: string[];
 }
 
 @Controller("ebook")

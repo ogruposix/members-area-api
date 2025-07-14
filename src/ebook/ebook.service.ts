@@ -70,13 +70,12 @@ export class EbookService {
     }
 
     if (ebook.productIds) {
-      const productIds = ebook.productIds.split(",");
       await this.prisma.productEbook.deleteMany({
         where: { ebookId: id },
       });
 
       await this.prisma.productEbook.createMany({
-        data: productIds.map((productId) => ({
+        data: ebook.productIds.map((productId) => ({
           ebookId: id,
           productId,
         })),
