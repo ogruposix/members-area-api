@@ -27,8 +27,8 @@ model Product {
   createdAt DateTime?   @default(now())
   updatedAt DateTime?   @updatedAt
 
-  ebooks Ebook[]
   orders Order[]
+  ebooks ProductEbook[]
 }
 
 model Order {
@@ -54,9 +54,19 @@ model Ebook {
   pdfUrl          String?
   createdAt       DateTime? @default(now())
   updatedAt       DateTime? @updatedAt
-  productId       String
+
+  products ProductEbook[]
+}
+
+model ProductEbook {
+  productId String
+  ebookId   String
+  createdAt DateTime? @default(now())
 
   product Product @relation(fields: [productId], references: [id])
+  ebook   Ebook   @relation(fields: [ebookId], references: [id])
+
+  @@id([productId, ebookId])
 }
 
 enum Role {

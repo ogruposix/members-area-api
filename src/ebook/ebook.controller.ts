@@ -19,6 +19,12 @@ import { Role } from "src/decorators/roles.decorator";
 import { ActiveUserId } from "src/decorators/active-user-id";
 import { FileInterceptor } from "@nestjs/platform-express";
 
+interface CreateEbookDto {
+  title: string;
+  description: string;
+  productIds: string[];
+}
+
 @Controller("ebook")
 export class EbookController {
   private readonly logger = new Logger(EbookController.name);
@@ -39,7 +45,7 @@ export class EbookController {
   @Post()
   @UseInterceptors(FileInterceptor("file"))
   async createEbook(
-    @Body() ebook: Prisma.EbookCreateInput,
+    @Body() ebook: CreateEbookDto,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -56,7 +62,10 @@ export class EbookController {
     @ActiveUserId() userId: string
   ) {
     this.logger.log(`User ${userId} is creating a new ebook`);
-    return this.ebookService.createEbook(ebook, file);
+
+    const { productIds, ...rest } = ebook;
+
+    return this.ebookService.createEbook(rest, productIds, file);
   }
 
   @Role("ADMIN")
