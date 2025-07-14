@@ -17,14 +17,18 @@ export class EbookService {
       include: {
         products: {
           include: {
-            product: true
-          }
-        }
-      }
+            product: true,
+          },
+        },
+      },
     });
   }
 
-  async createEbook(ebook: Prisma.EbookCreateInput, productIds: string[], file: Express.Multer.File) {
+  async createEbook(
+    ebook: Prisma.EbookCreateInput,
+    productIds: string,
+    file: Express.Multer.File
+  ) {
     const { url, fileName } = await this.fileService.uploadEbookFile(file);
 
     return this.prisma.ebook.create({
@@ -34,24 +38,24 @@ export class EbookService {
         pdfUrl: url,
         pdfUrlCreatedAt: new Date(),
         products: {
-          create: productIds.map((id) => {
+          create: productIds.split(",").map((id) => {
             return {
               product: {
                 connect: {
-                  id
-                }
-              }
-            }
-          })
+                  id,
+                },
+              },
+            };
+          }),
         },
       },
       include: {
         products: {
           include: {
-            product: true
-          }
-        }
-      }
+            product: true,
+          },
+        },
+      },
     });
   }
 
@@ -74,6 +78,10 @@ export class EbookService {
     if (ebook.fileName) {
       await this.fileService.deleteEbookFile(ebook.fileName);
     }
+
+    await this.prisma.productEbook.deleteMany({
+      where: { ebookId: id },
+    });
 
     return this.prisma.ebook.delete({
       where: { id },

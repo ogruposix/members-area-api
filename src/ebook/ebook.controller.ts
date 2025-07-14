@@ -22,7 +22,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 interface CreateEbookDto {
   title: string;
   description: string;
-  productIds: string[];
+  productIds: string;
 }
 
 @Controller("ebook")
