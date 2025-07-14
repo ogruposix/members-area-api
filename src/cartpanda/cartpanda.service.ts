@@ -47,6 +47,11 @@ export class CartpandaService {
         variant_title: string;
         variant_id: string;
       }>;
+      fulfillments: Array<{
+        tracking_number: string;
+        tracking_company: string;
+        created_at: string;
+      }>;
     };
   }> {
     // 1. Corrected Log Message: Now accurately describes the action.
@@ -68,11 +73,102 @@ export class CartpandaService {
           })
         )
       );
+
       return data;
     } catch (error) {
       // 4. Corrected Catch Block Log: Helps pinpoint failures.
       this.logger.error(`Failed to get order ${orderId}`, error.stack);
       // Re-throw the error so the caller can handle it (e.g., return a 500 status to the client).
+      throw error;
+    }
+  }
+
+  async getOrdersByCustomerEmail(email: string): Promise<{
+    orders: Array<{
+      id: number;
+      created_at: string;
+      line_items: Array<{
+        id: number;
+        title: string;
+        product_id: number;
+        name: string;
+        price: number;
+        quantity: number;
+      }>;
+      fulfillments: Array<{
+        tracking_number: string;
+        tracking_company: string;
+        created_at: string;
+      }>;
+    }>;
+  }> {
+    this.logger.log(`Fetching orders for customer with email: ${email}...`);
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(`/orders?email=${email}`).pipe(
+          catchError((error: AxiosError) => {
+            this.logger.error(
+              `Error response from CartPanda:`,
+              error.response?.data
+            );
+            throw new InternalServerErrorException(
+              `Error fetching orders for customer with email ${email} from CartPanda.`
+            );
+          })
+        )
+      );
+
+      if (data.orders.length === 0) {
+        this.logger.warn(`No orders found for customer with email: ${email}`);
+        return { orders: [] };
+      }
+
+      this.logger.log(
+        `Found ${data.orders.length} orders for customer with email: ${email}`
+      );
+
+      return data;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get orders for customer ${email}`,
+        error.stack
+      );
+      throw error;
+    }
+  }
+
+  async getCustomerByEmail(email: string): Promise<{
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+  }> {
+    this.logger.log(`Fetching customer with email: ${email} from CartPanda...`);
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(`/customers?email=${email}`).pipe(
+          catchError((error: AxiosError) => {
+            this.logger.error(
+              `Error response from CartPanda:`,
+              error.response?.data
+            );
+            throw new InternalServerErrorException(
+              `Error fetching customer with email ${email} from CartPanda.`
+            );
+          })
+        )
+      );
+
+      if (data.customers.length === 0) {
+        this.logger.warn(`No customer found with email: ${email}`);
+        throw new InternalServerErrorException(
+          `No customer found with email ${email}`
+        );
+      }
+
+      return data.customers[0];
+    } catch (error) {
+      this.logger.error(`Failed to get customer ${email}`, error.stack);
       throw error;
     }
   }

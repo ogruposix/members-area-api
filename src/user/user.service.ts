@@ -66,7 +66,7 @@ export class UserService {
     });
 
     if (!dbOrders || dbOrders.length === 0) {
-      throw new NotFoundException(`No orders found for user with ID ${userId}`);
+      return [];
     }
 
     const orderSums: any[] = [];
@@ -75,9 +75,11 @@ export class UserService {
       // Fetch order details from CartPanda
       const cartpandaOrder = await this.cartpanda.getOrderById(order.id);
       if (!cartpandaOrder) {
-        throw new NotFoundException(
-          `Order with ID ${order.id} not found in CartPanda`
-        );
+        orderSums.push({
+          ...order,
+          items: [], // No items found in CartPanda, but we still return the order
+        });
+        continue; // Skip if order not found in CartPanda
       }
 
       // Update the order with CartPanda data

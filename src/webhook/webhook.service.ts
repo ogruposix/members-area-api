@@ -67,8 +67,6 @@ export class WebhookService {
           (order as Order).line_items
         );
 
-        console.log(productName);
-
         const { id: productId } = await this.productService.findOne(
           Array.isArray(productName) ? productName[0] : productName
         );
