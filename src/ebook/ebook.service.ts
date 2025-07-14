@@ -83,7 +83,7 @@ export class EbookService {
       where: { ebookId: id },
     });
 
-    return this.prisma.ebook.delete({
+    return await this.prisma.ebook.delete({
       where: { id },
     });
   }
