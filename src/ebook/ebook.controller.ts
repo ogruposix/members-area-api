@@ -25,6 +25,12 @@ interface CreateEbookDto {
   productIds: string;
 }
 
+export interface EbookUpdateDto {
+  title?: string;
+  description?: string;
+  productIds?: string;
+}
+
 @Controller("ebook")
 export class EbookController {
   private readonly logger = new Logger(EbookController.name);
@@ -72,7 +78,7 @@ export class EbookController {
   @Put(":id")
   async updateEbook(
     @Param("id") id: string,
-    @Body() ebook: Prisma.EbookUpdateInput,
+    @Body() ebook: EbookUpdateDto,
     @ActiveUserId() userId: string
   ) {
     this.logger.log(`User ${userId} is updating ebook with ID: ${id}`);

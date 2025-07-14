@@ -1,7 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Ebook, Prisma } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { FileService } from "src/file/file.service";
+import { EbookUpdateDto } from "./ebook.controller";
 
 @Injectable()
 export class EbookService {
@@ -59,10 +60,35 @@ export class EbookService {
     });
   }
 
-  async updateEbook(id: string, ebook: Prisma.EbookUpdateInput) {
-    return this.prisma.ebook.update({
+  async updateEbook(id: string, ebook: EbookUpdateDto) {
+    const existingEbook = await this.prisma.ebook.findUnique({
       where: { id },
-      data: ebook,
+    });
+
+    if (!existingEbook) {
+      throw new NotFoundException("Ebook not found");
+    }
+
+    if (ebook.productIds) {
+      const productIds = ebook.productIds.split(",");
+      await this.prisma.productEbook.deleteMany({
+        where: { ebookId: id },
+      });
+
+      await this.prisma.productEbook.createMany({
+        data: productIds.map((productId) => ({
+          ebookId: id,
+          productId,
+        })),
+      });
+    }
+
+    return await this.prisma.ebook.update({
+      where: { id },
+      data: {
+        title: ebook.title || existingEbook.title,
+        description: ebook.description || existingEbook.description,
+      },
     });
   }
 
