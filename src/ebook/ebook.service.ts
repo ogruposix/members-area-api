@@ -15,6 +15,9 @@ export class EbookService {
 
   async getEbooks() {
     return this.prisma.ebook.findMany({
+      orderBy: {
+        createdAt: "asc",
+      },
       include: {
         products: {
           include: {
