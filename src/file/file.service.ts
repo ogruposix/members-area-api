@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { ReadStream } from "fs";
 
@@ -6,6 +6,7 @@ import { ReadStream } from "fs";
 export class FileService {
   private filesPath: string;
   private baseUrl: string;
+  private readonly logger = new Logger(FileService.name);
 
   constructor(private readonly configService: ConfigService) {
     this.filesPath = this.configService.get<string>("FILES_PATH") || "/files";
@@ -68,7 +69,8 @@ export class FileService {
     const filePath = path.join(this.filesPath, "ebooks", fileName);
 
     if (!fs.existsSync(filePath)) {
-      throw new NotFoundException("File not found");
+      this.logger.warn(`File ${fileName} not found for deletion`);
+      return;
     }
 
     fs.unlinkSync(filePath);
