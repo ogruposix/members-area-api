@@ -3,10 +3,15 @@ import { WebhookService } from "./webhook.service";
 import { WebhookPayload } from "./types/webhook-payload";
 import { Public } from "src/decorators/public.decorator";
 import { WebhookResponse } from "./types/webhook-response";
+import { ConfigService } from "@nestjs/config";
+import axios from "axios";
 
 @Controller("webhook")
 export class WebhookController {
-  constructor(private readonly webhookService: WebhookService) {}
+  constructor(
+    private readonly webhookService: WebhookService,
+    private readonly configService: ConfigService
+  ) {}
 
   @Public()
   @Post("paid-order")
@@ -31,6 +36,24 @@ export class WebhookController {
       payload.order.line_items.map((item) => item.title)
     );
     return await this.webhookService.paidOrder(payload);
+  }
+
+  @Public()
+  @Post("slack")
+  async slack(@Body() payload: WebhookPayload) {
+    const { order } = payload;
+
+    console.log(
+      `Product: ${order.line_items[0].title} was bought by ${order.customer.first_name} ${order.customer.last_name} at ${order.created_at} for a price of ${order.total_price}`
+    );
+
+    try {
+      await axios.post(this.configService.get("SLACK_WEBHOOK")!, {
+        text: `Product: ${order.line_items[0].title} was bought by ${order.customer.first_name} ${order.customer.last_name} at ${order.created_at} for a price of ${order.total_price}`,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   // @Post("email-test")
