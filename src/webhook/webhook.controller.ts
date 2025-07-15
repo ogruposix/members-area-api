@@ -44,12 +44,42 @@ export class WebhookController {
     const { order } = payload;
 
     console.log(
-      `Product: ${order.line_items[0].title} was bought by ${order.customer.first_name} ${order.customer.last_name} at ${order.created_at} for a price of ${order.total_price}`
+      `Product: ${order.line_items[0].title} was bought by ${
+        order.customer.first_name
+      } ${order.customer.last_name} at ${new Date(
+        order.created_at
+      ).toLocaleString("en-US", {
+        timeZone: "America/New_York",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })} for a price of ${Number(order.total_price).toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      })}`
     );
 
     try {
       await axios.post(this.configService.get("SLACK_WEBHOOK")!, {
-        text: `Product: ${order.line_items[0].title} was bought by ${order.customer.first_name} ${order.customer.last_name} at ${order.created_at} for a price of ${order.total_price}`,
+        text: `Product: ${order.line_items[0].title} was bought by ${
+          order.customer.first_name
+        } ${order.customer.last_name} at ${new Date(
+          order.created_at
+        ).toLocaleString("en-US", {
+          timeZone: "America/New_York",
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })} for a price of ${Number(order.total_price).toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        })}`,
       });
     } catch (error) {
       console.log(error);
