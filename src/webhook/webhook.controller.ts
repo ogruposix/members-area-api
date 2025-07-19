@@ -71,8 +71,8 @@ export class WebhookController {
         },
         {
           title: "Data",
-          value: new Date(order.created_at).toLocaleString("en-US", {
-            timeZone: "America/Scoresbysund",
+          value: new Date(order.created_at).toLocaleString("pt-BR", {
+            timeZone: "America/Manaus",
             weekday: "long",
             year: "numeric",
             month: "long",
